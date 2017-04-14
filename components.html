@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <!--<script src="vue@2.2.6.js"></script>-->
+    <script src="https://unpkg.com/vue-resource@1.3.0/dist/vue-resource.min.js"></script>
+</head>
+
+<body>
+    <div class="container" id="app">
+        <div class="row">
+            <div class="col-3">
+                <h1>Vue.js v°2</h1>
+                <h3>Table of Content:</h3>
+                <ul>
+                    <li><a href="index.html">Binding: </a></li>
+                    <li><a href="reactive.html">Properties</a></li>
+                    <li class="active">Components</li>
+                    <li><a href="shared.html">Comunicazione: </a></li>
+                    <li><a href="router.html">Router </a></li>
+                    <li><a href="vuecli.html">Vue CLI & Webpack </a></li>
+                </ul>
+            </div>
+            <div class="col-9">
+
+                <h3>Components </h3>
+                I componenti permettono di incapsulare dati e comportamenti in unità che possono essere riutilizzabili: possono essere locali
+                (interni all'istanza di vue) o globali (disponibile per ogni istanza di vue disponibile nella pagina):
+
+                <!-- GLOBAL Component -->
+                <global-component></global-component>
+
+                <!-- LOCAL Component -->
+                <local-component htmlstring="43"></local-component>
+
+                <!-- LOCAL Component  con transclusion (slot)-->
+                <local-component :parent-num="num" htmlstring="50">
+                    <span style="font-size:0.5rem" slot="top">
+                        Questo dimostra la trasclusion di vue tramite il tag speciale 'slot' che indica dove mettere il contenuto
+                    </span>
+                    <span style="font-size:0.5rem" slot="bottom">
+                        tramite l'attributo slot valorizzato come bottom si possono mettere più slot distinti tramite l'attributo 'name'
+                    </span>
+                </local-component>
+
+                <!-- TEMPLATE/COMPONENTI DINAMICI -->
+                <button type="button" @click="type=='local-component'? type='local-component-simple': type='local-component'">Swipe component</button>
+
+                <component :is="type" :parent-num="num" htmlstring="100"></component>
+
+                <hr>
+                <h3>Gestire contenuto con 'slot'</h3>
+                <p>Per aggiungere contenuto aggiuntivo ai componenti nella forma di elementi figli inseriti tra il tag di inizio
+                    e di fine del componente (la transclusion di Vue...). Tramite il tag <code><slot></slot></code> è possibile
+                    indicare dove si deve mettere il contenuto aggiuntivo e se ne vogliamo più di uno si può specificare
+                    dei nome tramite '
+                    <slot name="nomeidentificativo"></slot>'' </p>
+
+            </div>
+        </div>
+    </div>
+    <code>
+    
+</code>
+    <script>
+        // 1) si registra un componente globale con uno specifico tag prima di istanziare l'istanza di vue
+        Vue.component('global-component', {
+            template: '<div class="comp">Global component</div>' //NB:  ci deve essere un root (un div) che racchiude tutto
+        })
+
+        // 2) si può registrare un componente locale avente dati propri (che vengono restituiti da una funzione in quanto ogni istanza del componente locale può variare indipendentemente dalle altre), e come le stesse istanze di vue possono avere 'methods' e 'computed' e lifecycle hooks. I local components non possono accedere ai dati del padre contenitore, a meno che non si usino le così dette 'props':
+        var localComponenet = {
+            template: '<div @click="showNum()" class="comp">\
+                            <slot name="top"></slot>\
+                            <h3>Local component: </h3>\
+                            <p>the local number property is: {{number}}</p> \
+                            <p v-if="parentNum">the passed parent variable is {{parentNum}}</p>\
+                            <p>the passed string is {{htmlstring}}</p>\
+                            <slot name="bottom"></slot>\
+                        </div>',
+            props: ['htmlstring', 'parentNum'], // gli html attribute sono case insensitive quindi 'parentNum' diventa nell'html 'parent-num'
+            data: function () {
+                return {
+                    number: Math.floor(Math.random() * 100)
+                };
+            },
+            methods: {
+                showNum: function () {
+                    alert('My number is: ' + this.number);
+                }
+            }
+        }
+        var localComponentSimple = {
+            template: '<div @click="showNum()" class="comp">\
+                            <h3>Local simple component: </h3>\
+                            <p>the local number property is: {{number}}</p> \
+                            <p v-if="parentNum">the passed parent variable is {{parentNum}}</p>\
+                            <p>the passed string is {{htmlstring}}</p>\
+                        </div>',
+            props: ['htmlstring', 'parentNum'], // gli html attribute sono case insensitive quindi 'parentNum' diventa nell'html 'parent-num'
+            data: function () {
+                return {
+                    number: Math.floor(Math.random() * 100)
+                };
+            },
+            methods: {
+                showNum: function () {
+                    alert('My number is: ' + this.number);
+                }
+            }
+        }
+
+        // istanza di Vue
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                num: 55,
+                type: 'local-component' // binding dinamico con il nome del componente
+            },
+            computed: {},
+            watch: {},
+            // si registra un local component
+            components: {
+                'local-component': localComponenet,
+                'local-component-simple': localComponentSimple
+            }
+        });
+    </script>
+</body>
+
+</html>

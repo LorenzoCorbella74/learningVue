@@ -1,0 +1,26 @@
+{
+  "name": "vue_test",
+  "version": "1.0.0",
+  "description": "Pagine di studio per vue.js 2",
+  "main": "vue@2.2.6.js",
+  "scripts": {
+    "build:sass": "node-sass -r --output-style compact scss/style.scss -o css",
+    "watch:sass": "nodemon -e scss -x \"npm run build:sass\"",
+    "serve": "browser-sync start --server --files \"css/*.css\"",
+    "start": "npm run serve | npm run watch:sass"
+  },
+  "keywords": [
+    "vue",
+    "sass",
+    "npm script"
+  ],
+  "author": "L. Corbella",
+  "license": "ISC",
+  "dependencies": {
+    "node-sass": "3.4.2"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.18.8",
+    "nodemon": "^1.11.0"
+  }
+}

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vue-resource@1.3.0/dist/vue-resource.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <div class="container" id="app">
+        <div class="row">
+            <div class="col-3">
+                <h1>Vue.js v°2</h1>
+                <h3>Table of Content:</h3>
+                <ul>
+                    <li><a href="index.html">Binding: </a></li>
+                    <li class="active">Properties</li>
+                    <li><a href="components.html">Components: </a></li>
+                    <li><a href="shared.html">Comunicazione: </a></li>
+                    <li><a href="router.html">Router </a></li>
+                    <li><a href="vuecli.html">Vue CLI & Webpack </a></li>
+                </ul>
+            </div>
+            <div class="col-9">
+
+                <h3>Reactive properties: </h3>
+                <p>Una volta aggiunte delle initial data properties all'interno di <code>data</code> l'istanza di Vue registra
+                    tale proprietà e rimane in ascolto di cambiamenti (tramite get function che ne ritorna il valore). Tramite
+                    set function è possibile aggiornare i valori delle proprietà e l'elemento dell'ui associati vengono ri-renderizzati.
+                    Quindi se definisco una proprietà all'interno di <code>data</code> e un'altra proprietà all'esterno (vm.seconproperty='test')
+                    quest'ultima verrà attaccata all'istanza di vue ma non verrà visualizzata finchè non cambia un'altra
+                    prprietà che fà rirenderizzare l'elemento. Tutto ciò che è all'interno di <code>data</code> è pertanto
+                    'reattivo', ciò che è all'esterno no: da notare che non è possibile settare manualmente delle proprietà
+                    ad oggetti contenuti in <code>data</code>come <code>vm.nomeobj.nuovaproprietà='newvalue';</code>(anche
+                    se è possibile aggiungere degli obj agli array che sono in <code>data</code> tramite le principali funzioni
+                    (push..) ) ma per aggiungere delle proprietà reattive ad un oggetto innestato si deve invece utilizzare:
+                    <code>Vue.set(vm.object, 'nomepropietà', valueProprietà )</code> che permette di ri-renderizzare l'ui.
+                    Per cancellare degli elementi si usa invece <code>Vue.delete(vm.nomearray,1);</code> .</p>
+
+                <hr>
+                <h3>Computed properties</h3>
+                <p>Permettono di sviluppare delle relazioni più sofisticate tra le data properties. Non è infatti possibile
+                    definire una proprietà che dipende da altre proprietà in <code>data</code> (<code>fullname: this.name+' '+this.surname; </code>),
+                    ma si deve necessariamente definire una computed properties (una funzione) che definisce tale relazione
+                    in 'computed'. Dato che sono funzioni si poteva utilizzare la stessa funzione ed includerla in 'methods'
+                    ma le computed properties hanno un plus importante: non vengono ricalcolate ad ogni rendering della pagina,
+                    mentre la stessa funzione in 'methods' vien calcolata ad ogni nuovo rendering dell'UI.</p>
+                <div>
+                    <input type="text" v-model.number.lazy="tempFar"> Temperature in Celsius: {{tempCelsius}}
+                </div>
+
+                <hr>
+                <h3>Watchers</h3>
+                <p>Permettono di gestire proprietà che dipendono da altre proprietà (specialmente quando si deve eseguire operazioni
+                    asincrone in risposta a cambiamenti di proprietà). Si aggiunge una proprietà <code>watch</code> all'istanza
+                    di vue con dentro un obj di funzioni aventi come chiave il nome della proprietà che vogliamo guardare.
+                    la funzione utilizzata può essere messa nelle computed? no se si deve fare delle chiamate in quanto le
+                    computed devono ritornare un valore immediatamente e non possono aspettare per ajax response.
+                </p>
+                <input type="text" v-model="question"> {{response}}
+                <ul>
+                    <li v-for="user in users">{{user.name}}</li>
+                </ul>
+
+                <!-- ERRORS -->
+                <ul v-if="errors && errors.length">
+                    <li v-for="error of errors">
+                        {{error.message}}
+                    </li>
+                </ul>
+
+                <hr>
+                <h3>lifecycle hooks</h3>
+                <p>Una istanza di Vue espone vari lifecycle Hooks, funzioni che vengono eseguite in risposta a certi eventi
+                    che si hanno in fase di inizializzazione, aggiornamento o distruzione (specialmente per i componenti).</p>
+                <ul>
+                    <li><code>beforeCreate</code> : before instance inizialization</li>
+                    <li><code>Created</code> : reactive properties configured; instance not yet mounted. E' dove si possono settare
+                        delle proprietà per la 1° volta.</li>
+                    <li><code>beforeMount</code> :Template compiled and ready to be inserted in DOM</li>
+                    <li><code>Mounted</code> :Template and inserted in DOM replacing el element</li>
+                    <li><code>beforeUpdated</code> :Data changed; update pending</li>
+                    <li><code>Updated</code> : Re-rendered to reflect the changes</li>
+                    <li><code>beforeDestroy</code> : vm.$destroy() called</li>
+                    <li><code>Destroyed</code> : Watchers and event handlers removed; no reactivity</li>
+
+                </ul>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                tempFar: 0,
+                question: '',
+                response: '',
+                users: [],
+                // error
+                errors: []
+            },
+            /*methods: {
+                tempCelsius:function(){
+                    console.log('call method');
+                    return Math.round(5/9*(this.tempFar-32))
+                }
+            },*/
+            computed: {
+                tempCelsius: function () {
+                    console.log('call method');
+                    return Math.round(5 / 9 * (this.tempFar - 32))
+                }
+            },
+            watch: {
+                question: function (newvalue) {
+                    if (newvalue.indexOf('users') > -1) {
+                        this.response = "Ok, I can list the users for you"
+                        // si usa vue-resource per fare una chiamata (ma non è più la libreria ufficiale)
+                        this.$http.get('http://5847d6a3b0079b12008911ad.mockapi.io/api/v1/users')
+                            .then(response => {
+                                // get body data
+                                vm.users = response.body; // non this.users perchè siamo dentro il .then...
+                            }, err => {
+                                // error callback
+                                this.errors.push(err)
+
+                            });
+                        // oppure jquery
+                        /*$.getJSON('http://5847d6a3b0079b12008911ad.mockapi.io/api/v1/users')
+                        .done(function(data){
+                            vm.users=data;
+                        });*/
+                        // oppure axios che lavora su browser/node.js e su typescript https://github.com/mzabriskie/axios
+                        // nel caso si sia usato vue-resource e si vuole passare ad axious si può mettere: Vue.prototype.$http = axious
+                        // e non c'è da cambiare niente nel codice... 
+                        /* axios.get('/http://5847d6a3b0079b12008911ad.mockapi.io/api/v1/users')
+                             .then(function (response) {
+                                 console.log(response);
+                             })
+                             .catch(err => {
+                                this.errors.push(err)
+                                })*/
+
+                        /*  
+                    
+                            IL pattern per le CHIAMATE AJAX è:
+                            1) mettere in data una proprietà vuota
+                            2) sugli hook 'mounted' o su 'created' mettere la chiamata che valorizza la proprietà sopra!
+                    
+                        */
+
+                    } else {
+                        this.response = "Sorry I do not understand the question.";
+                        this.users = [];
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

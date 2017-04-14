@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-3">
+                <h1>Vue.js v°2</h1>
+                <h3>Table of Content:</h3>
+                <ul>
+                    <li><a href="index.html">Binding: </a></li>
+                    <li><a href="reactive.html">Properties</a></li>
+                    <li><a href="components.html">Components </a></li>
+                    <li class="active">Comunicazione</li>
+                    <li><a href="router.html">Router </a></li>
+                    <li><a href="vuecli.html">Vue CLI & Webpack </a></li>
+                </ul>
+            </div>
+            <div class="col-9">
+                <h1>Comunicazione tra istanze/componenti</h1>
+
+                <h3>1) con oggetti condivisi: </h3>
+                <div id="app1" style="border:1px solid grey; padding:16px;width:60%">
+                    <h4>Istance 1°</h4>
+                    {{personalprop}} - <input type="text" v-model="shared.user.name">
+                </div>
+                <div id="app2" style="border:1px solid grey; padding:16px;width:60%">
+                    <h4>Istance 2°</h4>
+                    {{personalprop}} - {{shared.user.name}}
+                </div>
+
+                <hr>
+                <h3>2) con eventi tra child/parent</h3>
+                <p>Tramite eventi è possibile far comunicare un componente figlio con il componente padre che lo contiene o
+                    direttamente con la Vue istance</p>
+                <div id="root" style="border:1px solid red; padding:16px;width:60%">
+                    <local-component @passed="showFromChild"></local-component>
+                   <p> Data from child: {{sonNumber}}</p>
+                </div>
+
+                <hr>
+                <h3>2) con eventi tra elementi non innestati</h3>
+               <p>In Vue 1.x c'era la possibilità di .dispatch e .broadcast event. In Vue 2 tale possibilità è stata deprecata e si usa un event emitter classico:</p>
+               <pre>
+                   <code>
+        this.$emit('nome_evento', data);         // emette l'evento
+        this.$on('nome_evento', function(){      // ascolta l'evento
+            ....
+        }); 
+                   </code>
+                </pre> 
+                <p>Ogni vue istance ha accesso a questa event structure pertanto si può creare una root vue event istance e la possiamo chiamare <code>windows.Event = new Vue(); </code>. Si può poi utilizzare questa istanza per far comunicare qualsiasi istanza indipendentemente dalla posizione gerarchica: </p>
+               <pre>
+                   <code>
+        Event.$emit('nome_evento', data);         // emette l'evento
+        Event.$on('nome_evento', function(){      // ascolta l'evento (nel 'created' hook)
+            
+        }); 
+
+        
+        // Esempio di event dispatcher GLOBALE
+        windows.Event = new class {
+            constructor(){
+                this.vue = new Vue();
+            }
+            fire(event, data =null){
+                this.vue.$emit(event, data);
+            }
+            listen(eventname, callback){
+                this.vue.$on(eventname, callback);
+            }
+        }
+                   </code>
+               </pre>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <script>
+        // si definisce un oggetto globale che può essere condiviso tra istanze/componenti diversi
+        let store = {
+            user: {
+                name: "Lorenzo",
+                surname: "Corbella"
+            }
+        };
+
+        var localComponent = {
+            template: '<div style="border:1px dotted green; margin-left:24px;padding:16px;width:90%">\
+                            <h3>Local component: </h3>\
+                            <p>the local number property is: <input type="text" v-model="number"/></p> \
+                            <button class="btn" v-on:click="pass2Dad(number)">Pass to Dad</button>\
+                        </div>',
+            data: function () {
+                return {
+                    number: Math.floor(Math.random() * 100)
+                };
+            },
+            methods: {
+                pass2Dad(number) {
+                    this.$emit('passed', number); // nome evento (che è referenziato nell'html) ed eventuale data da passare
+                }
+            }
+        }
+
+        // si definiscono delle istanze distinte di vue (stessa osa potrebbe essere fatto per componenti)
+        new Vue({
+            el: '#app1',
+            data: {
+                shared: store,
+                personalprop: "Hola!"
+            },
+            methods: {
+
+            }
+        });
+
+        new Vue({
+            el: '#app2',
+            data: {
+                shared: store,
+                personalprop: "Ciao!"
+            },
+            methods: {}
+        });
+
+        // 3° (la root vue istance di solito sta in fondo sotto tutti i componenti figli)
+        new Vue({
+            el: '#root',
+            data: {
+                sonNumber: ''
+            },
+            methods: {
+                showFromChild(number) {
+                    //alert('Number is ' + number + ' !');
+                    this.sonNumber = number;
+                }
+            },
+            components: {
+                'local-component': localComponent
+            }
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,9 @@
+@function calcRem($size) {
+  $remSize: $size / 10px; // 1.4rem == 14px -> 1rem == 10px
+  @return #{$remSize}rem;
+}
+
+@mixin fontSize($size) {
+  font-size: $size; //Fallback in px
+  font-size: calcRem($size);
+}

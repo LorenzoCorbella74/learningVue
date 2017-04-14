@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div class="container" id="app">
+
+<!--    <nav>
+        <ul>
+            <li><a href="#">Linkable</a></li>
+            <li><a href="#">Linkable</a></li>
+            <li><a href="#">Linkable</a></li>
+            <li><a href="#">Linkable</a></li>
+            <li><a href="#">Linkable</a></li>
+        </ul>
+    </nav>-->
+
+        <div class="row">
+            <div class="col-3">
+                <h1>Vue.js v°2</h1>
+
+                <h3>Table of Content:</h3>
+                <ul>
+                    <li class="active">Binding:</li>
+                    <li><a href="reactive.html">Properties</a></li>
+                    <li><a href="components.html">Components </a></li>
+                    <li><a href="shared.html">Comunicazione: </a></li>
+                    <li><a href="router.html">Router </a></li>
+                    <li><a href="vuecli.html">Vue CLI & Webpack </a></li>
+                </ul>
+            </div>
+            <div class="col-9">
+
+                <h3>Binding: </h3>
+                <p class="body">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Suscipit amet tempore eligendi! Architecto eaque rem, cumque saepe, aut obcaecati sapiente voluptas natus! Illo veniam totam dolorum porro voluptatibus eos, vel. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Similique laudantium inventore ut laborum repudiandae nihil veritatis itaque, quibusdam ipsa, optio accusantium corrupti facilis, perspiciatis distinctio aliquid neque aut accusamus velit.</p>
+
+                <ul>
+                    <li>Text interpolation (one way binding): <strong>{{ message }} </strong>oppure con <code>v-text</code> <strong><span v-text="message"></span></strong></li>
+                    <li>Direttiva <code>v-bind</code> che lega l'attributo dell'elemento HTML ad una proprietà dell'istanza di
+                        vue. Si può utilizzare <code>v-bind:attributo</code>: <a v-bind:href="url.link">{{ url.text }}</a>                        o lo shorthand <code>:attributo</code>: <a :href="url.link">{{ url.text }}</a></li>
+                    <li>
+                        Input <code>v-bind con shorthand</code>: Nome <input type="text" :value="nome">
+                    </li>
+                    <hr>
+                    <li> Two way binding con <code>v-model</code>: <input type="text" v-model="cognome"> v-model è syntactical
+                        sugar in quanto equivale a: <input type="text" :value='cognome' @input="cognome = $event.target.value">                        </li>
+                    <li> Two way binding con <code>v-model.lazy</code>: <input type="text" v-model.lazy="cognome"></li>
+                    <li> Two way binding con <code>v-model.trim</code>: <input type="text" v-model.trim="cognome"></li>
+                    <li> Two way binding con <code>v-model.number</code>: <input type="text" v-model.numbers="eta"></li>
+                    {{cognome}}
+
+                    <hr> Cicli: <code>v-for con array e index(zero based)</code>:
+                    <li v-for="(language,index) in languages">{{index}}) {{language}}</li>
+                    <code>v-for con oggetti</code>:
+                    <li v-for="(valore, chiave, index) in famiglia">{{index+1}}. {{chiave}}:{{valore}}</li>
+
+                    <hr> Visibilità: <code>v-show</code>:
+                    <li v-show="visibility">You see me!</li>
+                    <hr> <code>v-if (si rimuove l'elemento se l'espressione è false)</code>:
+                    <p v-if="languages.length>1">Am 'I removed!</p>
+                    <p v-else>Condizione soddisfatta</p>
+                    Esempio di <code>v-else che è applicata all'elemento immediatamente successivo all'elemento su cui è applicato v-if se la condizione fallisce. E' possibile infine utilizzare v-else-if</code>
+
+                    <hr>
+                    <h3>Event Handling : </h3>
+                    Si può utilizzare la sintassi <code>v-on:nomeevento</code> o lo shorthand <code>@nomevento</code>. Si
+                    possono passare parametri alle funzioni, l'evento stesso e dei modificatori (come .prevent per preventDefault()):
+                    <button type="button" v-on:click="toggleVis(); message='ciao!'">Toggle</button>
+                    <button type="button" @click.prevent="toggleVis($event)">Toggle</button>
+                    <p>Di fatto sostituiscono i normali event handler che possono comunque essere inseriti nel mounted hook:</p>
+
+                    <hr>
+                    <h3>Style & Class: </h3>
+                    <p>Binding to the style attribute: <code>:style</code></p>
+                    <div :style="{border:'solid 1px black', 'padding-bottom': padbottom +'px', color: color}"> Styling con obj literal binded allo style attribute (su html).</div>
+                    <div :style="fancyDiv">Styling con obj literal binded allo style attribute (su vue istance).</div>
+                    <div :style="[fancyDiv, fancierDiv]" @mouseover="fancierDiv.border='dashed 1px black'" @mouseout="fancierDiv.border='solid 1px green'">Styling con [] di obj literal binded allo style attribute (su vue istance).Merge di obj con l'ultimo
+                        che eventualmente sovrascrive i primi.</div>
+
+                    <hr> Binding to the class attribute: <code>:class</code>
+                    <button type="button" @click="toggleColor">Change color</button>
+                    <div class="square" :class="{blue:cold, red:hot}"></div>
+                    <div class="square" :class="cssClasses"></div>
+                </ul>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <script>
+        /* 
+            E' possibile accedere alle proprietà dell'istanza di vue da console utilizzando la variabile vm 
+            oppure se non definita (da var vm = ...) oppure tramite window.App = new Vue() e poi accedere ad App
+        */
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                // quan si mettono tutte le proprietà del mio modello FE
+                // e relativi valori di inizializzazione (form, obj, array, etc...) 
+                message: 'Hello Vue.js!',
+                bind: "Esepio di v-bind: " + new Date(),
+                url: {
+                    link: "https://www.google.it",
+                    text: "Google"
+                },
+                nome: "Lorenzo",
+                cognome: 'Corbella',
+                eta: "42",
+                languages: ['html', 'css', 'js'],
+                famiglia: {
+                    figlia: "Luce",
+                    mamma: 'Chiara',
+                    babbo: 'Lorenzo'
+                },
+                visibility: false,
+                removed: true,
+                color: 'orange',
+                padbottom: 5,
+                fancyDiv: {
+                    backgroundColor: 'lightgrey',
+                    borderRadius: '10px',
+                    padding: '5px',
+                    marginTop: '24px'
+                },
+                fancierDiv: {
+                    fontFamily: 'Arial, Helvetica',
+                    border: 'solid 3px red'
+                },
+                cold: true,
+                hot: false,
+                cssClasses: {
+                    'dashed-border': true,
+                    blue: false
+                }
+
+            },
+            methods: {
+
+                /* NB: ci si referenzia alle proprietà reattive definite in 'data' con this. */
+
+                toggleVis: function (event) {
+                    console.log(event);
+                    this.visibility = !this.visibility;
+                },
+                toggleColor: function (event) {
+                    console.log(event);
+                    this.cold = !this.cold;
+                    this.hot = !this.hot;
+                }
+            },
+            mounted: function () {
+                var self = this;
+                // in ascolto di eventi !!!
+                document.addEventListener("keydown", function (e) {
+                    // console.log('Keycode: ', e.keyCode);
+                    if (e.keyCode == 37) {
+                        console.log("Left arrow pressed");
+                    } else if (e.keyCode == 39) {
+                        console.log("Right Arrow pressed");
+                    } else if (e.keyCode == 27) {
+                        console.log("ESC pressed");
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
+
+<script>
+    // Nella realtà si sta in ascolto di un change event sull'input e si svolge logica
+    // su tale
+    Vue.component('input-with-val', {
+        template: `<input type="text" :value="code" @input="updateCode($event.target.value)" ref="input">`,
+        methods: {
+            updateCode(code) {
+                // validation
+                // sanityze
+                if (code === 'test') {
+                    alert('not valid!');
+                    this.$refs.input.value=code='';
+                }
+                this.$emit('input',code);   
+            }
+        }
+    })
+</script>
